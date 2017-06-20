@@ -11,9 +11,9 @@
 6.主线程Runloop提交CATransaction，开始进行图像渲染
   6.1 如果数据没有字节对齐，Core Animation会再拷贝一份数据，进行字节对齐。
   6.2 GPU处理位图数据，进行渲染。
+ 
 
-
-
+  
 * Xcode会对png图片进行解码优化, jpeg的解压算法更复杂
   
 - imageNamed:与imageWithContentsOfFile:
@@ -79,5 +79,12 @@ CGImageSourceUpdateData(data, false) 来更新图片源，最后在用 CGImageSo
 [iOS 保持界面流畅的技巧](http://blog.ibireme.com/2015/11/12/smooth_user_interfaces_for_ios/)
 [iOS 处理图片的一些小 Tip](http://blog.ibireme.com/2015/11/02/ios_image_tips/)
 
-   
-   
+
+
+其它资料:
+[谈谈 iOS 中图片的解压缩](http://blog.leichunfeng.com/blog/2017/02/20/talking-about-the-decompression-of-the-image-in-ios/)
+
+
+
+
+
