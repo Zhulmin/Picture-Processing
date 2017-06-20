@@ -3,16 +3,16 @@
 
 
 #### iOS从磁盘加载一张图片，使用UIImageVIew显示在屏幕上，需要经过以下步骤：
-1.从磁盘拷贝数据到内核缓冲区
-2.从内核缓冲区复制数据到用户空间
-3.生成UIImageView，把图像数据赋值给UIImageView
-4.如果图像数据为未解码的PNG/JPG，解码为位图数据
-5.CATransaction捕获到UIImageView layer树的变化
-6.主线程Runloop提交CATransaction，开始进行图像渲染
-  6.1 如果数据没有字节对齐，Core Animation会再拷贝一份数据，进行字节对齐。
-  6.2 GPU处理位图数据，进行渲染。
- 
-
+1.从磁盘拷贝数据到内核缓冲区  
+2.从内核缓冲区复制数据到用户空间  
+3.生成UIImageView，把图像数据赋值给UIImageView  
+4.如果图像数据为未解码的PNG/JPG，解码为位图数据  
+5.CATransaction捕获到UIImageView layer树的变化  
+6.主线程Runloop提交CATransaction，开始进行图像渲染  
+  6.1 如果数据没有字节对齐，Core Animation会再拷贝一份数据，进行字节对齐。  
+  6.2 GPU处理位图数据，进行渲染。  
+  
+    
   
 * Xcode会对png图片进行解码优化, jpeg的解压算法更复杂
   
@@ -43,6 +43,7 @@
 ```
   
   
+  
 * 手动解码(二)
 1.CGImageSourceCreateWithData(data) 创建 ImageSource。
 2.CGImageSourceCreateImageAtIndex(source) 创建一个未解码的 CGImage。
@@ -51,18 +52,18 @@
 ImageIO 解码发生在最后一步，这样获得的数据是没有经过颜色类型转换的原生数据（比如灰度图像）。  
   
   
-
+  
 - 缓存和异步解码只是缓解CPU压力的方法之一，除此之外还有很多地方可以优化CPU和GPU资源，比如之前提到的对于圆角和阴影的处理。
-
+  
 - 使用CATiledLayer加载大图, 也可以优化图片显示。可以看到当滑动屏幕的时候图片的显示会呈现碎片式的淡入淡出效果。(参考地图类app)
-
+  
 - 字节对齐
 那什么是字节对齐呢，按我的理解，为了性能，底层渲染图像时不是一个像素一个像素渲染，而是一块一块渲染，数据是一块块地取，就可能遇到这一块连续的内存数据里结尾的数据不是图像的内容，是内存里其他的数据，可能越界读取导致一些奇怪的东西混入，所以在渲染之前CoreAnimation要把数据拷贝一份进行处理，确保每一块都是图像数据，对于不足一块的数据置空。大致图示：(pixel是图像像素数据，data是内存里其他数据)
   
 - 怎么能避免缓存呢  
 1. 手动调用 CGImageSourceCreateWithData() 来创建图片，并把 ShouldCache 和 ShouldCacheImmediately 关掉。这么做会导致每次图片显示到屏幕时，解码方法都会被调用，造成很大的 CPU 占用。
 2. 把图片用 CGContextDrawImage() 绘制到画布上，然后把画布的数据取出来当作图片。这也是常见的网络图片库的做法。
-
+  
 - 怎样像浏览器那样边下载边显示图片
 图片本身有 3 种常见的编码方式：
 第一种是 baseline，即逐行扫描。默认情况下，JPEG、PNG、GIF 都是这种保存方式。
@@ -71,17 +72,17 @@ ImageIO 解码发生在最后一步，这样获得的数据是没有经过颜色
 在下载图片时，首先用 CGImageSourceCreateIncremental(NULL) 创建一个空的图片源，随后在获得新数据时调用
 CGImageSourceUpdateData(data, false) 来更新图片源，最后在用 CGImageSourceCreateImageAtIndex() 创建图片来显示。  
   
+   
+    
+    
+参考的文章:  
+[关于iOS中图像显示的一些优化处理](http://www.jianshu.com/p/e19fcaf29c77)    
+[iOS 保持界面流畅的技巧](http://blog.ibireme.com/2015/11/12/smooth_user_interfaces_for_ios/)  
+[iOS 处理图片的一些小 Tip](http://blog.ibireme.com/2015/11/02/ios_image_tips/)  
+
   
   
-  
-参考的文章:
-[关于iOS中图像显示的一些优化处理](http://www.jianshu.com/p/e19fcaf29c77)  
-[iOS 保持界面流畅的技巧](http://blog.ibireme.com/2015/11/12/smooth_user_interfaces_for_ios/)
-[iOS 处理图片的一些小 Tip](http://blog.ibireme.com/2015/11/02/ios_image_tips/)
-
-
-
-其它资料:
+其它资料:  
 [谈谈 iOS 中图片的解压缩](http://blog.leichunfeng.com/blog/2017/02/20/talking-about-the-decompression-of-the-image-in-ios/)
 
 
